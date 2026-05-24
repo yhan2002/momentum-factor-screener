@@ -1,6 +1,8 @@
 # US Large-Cap Momentum Screener
 
-A Python-based quantitative research workflow designed to analyze momentum factors and risk-adjusted performance across major U.S. large-cap equities.
+A Python-based quantitative research workflow for momentum factor analysis across U.S. large-cap equities.
+
+![Momentum Chart](output/momentum_chart.png)
 
 ## Overview
 
