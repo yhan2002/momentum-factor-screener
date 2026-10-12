@@ -59,7 +59,7 @@ The project was built as part of a self-directed effort to develop practical exp
 ```bash
 momentum-factor-screener/
 │
-├── momentum_factor_analysis.ipynb
+├── momentum_factor.ipynb
 ├── requirements.txt
 ├── README.md
 └── output/
