@@ -1,91 +1,60 @@
 # US Large-Cap Momentum Screener
 
-A Python-based quantitative research workflow for momentum factor analysis across U.S. large-cap equities.
+A small Python/Jupyter research workflow for ranking a fixed list of 40 U.S. large-cap stocks using adjusted closing prices, momentum, and an annualized return-to-volatility ratio.
 
-![Momentum Chart](output/momentum_chart.png)
+## Current scope
 
-## Overview
+This is a research notebook, with no broker connection, order execution, portfolio-account records, scheduler, or production service. The ticker list is defined in the notebook; it is not the complete or point-in-time S&P 500 universe.
 
-This project explores systematic equity screening methodologies commonly used in quantitative investing. Using Python and Jupyter Notebook, the workflow retrieves historical market data, calculates momentum signals, computes Sharpe Ratios, and ranks equities based on quantitative performance metrics.
+- Prices come from Yahoo Finance through `yfinance`, starting at `2024-01-01` and ending at the provider's latest available data when run.
+- Columns with any missing price are dropped. This can change the retained universe.
+- `Momentum_60D` is the existing calculation `last price / price at iloc[-60] - 1`: the endpoints span 59 return intervals. The label and calculation have not been changed.
+- `Sharpe_Ratio` uses daily mean return divided by daily sample standard deviation, multiplied by `sqrt(252)`, with a zero risk-free-rate assumption over the downloaded history.
+- Results are ranked by momentum. This is not a backtest and does not include fees, slippage, or a historical membership universe.
 
-The project was built as part of a self-directed effort to develop practical experience in factor research, data analysis, and AI-assisted quantitative workflows.
+## Files
 
----
+| Path | Purpose |
+| --- | --- |
+| [`momentum_factor.ipynb`](momentum_factor.ipynb) | Nine code cells: download, calculate, rank, plot, and export. |
+| [`requirements.txt`](requirements.txt) | Python dependency lower bounds; not a locked environment. |
+| [`output/momentum_ranking.csv`](output/momentum_ranking.csv) | Saved research ranking from a previous run. |
+| [`output/momentum_chart.png`](output/momentum_chart.png) | Saved research chart from a previous run. |
 
-## Features
+The saved outputs are examples, not live recommendations or account holdings. Their chart title mentions the S&P 500, but only the fixed notebook ticker list is evaluated.
 
-* Automated retrieval of U.S. large-cap equity price data using Yahoo Finance
-* 60-day momentum factor calculation
-* Risk-adjusted performance analysis using Sharpe Ratios
-* Cross-sectional ranking of equities based on quantitative metrics
-* Data visualization for top-performing momentum stocks
-* CSV export of screening results
+![Saved momentum research chart](output/momentum_chart.png)
 
----
+## Environment and execution
 
-## Tech Stack
+Use Python with the packages in `requirements.txt`. A typical fresh setup is shown below; a clean installation and a live Yahoo download were not performed in the latest review.
 
-* Python
-* pandas
-* numpy
-* matplotlib
-* yfinance
-* Jupyter Notebook
-
----
-
-## Quantitative Concepts
-
-* Momentum Factor Investing
-* Cross-Sectional Equity Screening
-* Risk-Adjusted Return Analysis
-* Statistical Performance Measurement
-
----
-
-## Sample Workflow
-
-1. Retrieve historical equity price data
-2. Calculate daily returns
-3. Generate 60-day momentum signals
-4. Compute annualized Sharpe Ratios
-5. Rank equities by quantitative metrics
-6. Visualize and export results
-
----
-
-## Project Structure
-
-```bash
-momentum-factor-screener/
-│
-├── momentum_factor.ipynb
-├── requirements.txt
-├── README.md
-└── output/
-    ├── momentum_ranking.csv
-    └── momentum_chart.png
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m jupyter notebook momentum_factor.ipynb
 ```
 
----
+Open the notebook from the repository root and run its cells in order. The ticker list and download start date are in cells 2 and 3. Running the download contacts Yahoo Finance. The export cells create `output/` if needed and overwrite its CSV and PNG; copy any results you want to keep before rerunning.
 
-## Motivation
+No API key or account credential is required by the current notebook. Do not add one to a notebook cell or saved output.
 
-This project was developed to strengthen practical quantitative research skills and explore AI-assisted financial research workflows using tools such as ChatGPT and Cursor AI.
+## Validation
 
-Areas of focus include:
+This source-only check does not download data or modify saved results:
 
-* systematic investing
-* factor-based equity analysis
-* workflow automation
-* data-driven financial research
+```powershell
+python -c "import ast,json,pathlib; n=json.loads(pathlib.Path('momentum_factor.ipynb').read_text(encoding='utf-8')); [ast.parse(''.join(c['source'])) for c in n['cells'] if c['cell_type']=='code']; print('Notebook JSON and Python syntax OK')"
+git diff --check
+```
 
----
+On 2026-10-12, all nine code cells passed syntax and notebook-schema checks and executed with synthetic prices, network access blocked, and exports redirected to a temporary directory. The resulting 40-row ranking and chart were checked. This verifies the offline calculation/export path, not current Yahoo responses or market results. There is no committed automated test suite or CI workflow.
 
-## Future Improvements
+The review used an existing Python 3.14 environment. A dependency dry-run confirmed the numeric/download libraries but could not resolve the `jupyter` metapackage with offline package lookup; it does not establish that a fresh installation succeeds.
 
-* Multi-factor ranking models
-* Earnings surprise factor integration
-* Portfolio backtesting framework
-* Automated market alert system
-* NLP-based earnings call analysis
+## Privacy before publishing
+
+Review notebook source, outputs, metadata, charts, CSVs, and the staged diff before committing. Keep account records, credentials, personal paths, and contact details out of published files. Local environment files, logs, virtual environments, and notebook checkpoints are ignored; existing tracked files and Git history are not erased by ignore rules.
+
+Commit author and committer information is also public in this repository. Use the GitHub-provided private commit email if you do not want a personal address exposed. Changing future commit identity does not remove older metadata.
